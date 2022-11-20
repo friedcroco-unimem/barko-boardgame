@@ -21,6 +21,7 @@ func (d *disappear) Perform(node Node, dt float32) {
 
 type FuncCall interface {
 	Action
+	SetFunc(f func())
 }
 
 type funcCall struct {
@@ -30,6 +31,14 @@ type funcCall struct {
 
 func NewFuncCall() FuncCall {
 	return &funcCall{NewBaseAction(), func() {}}
+}
+
+func NewFuncCallWithFunc(f func()) FuncCall {
+	return &funcCall{NewBaseAction(), f}
+}
+
+func (d *funcCall) SetFunc(f func()) {
+	d.function = f
 }
 
 func (d *funcCall) Perform(node Node, dt float32) {

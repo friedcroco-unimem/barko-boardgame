@@ -50,14 +50,29 @@ func (s *BaseScene) draw(screen *ebiten.Image) {
 
 func (s *BaseScene) Update(dt float32) {
 	removedChildren := make([]Node, 0)
+	rearrangeChildren := make([]Node, 0)
 	s.children.Ascend(func(node Node) bool {
 		if node.IsRemoved() {
 			removedChildren = append(removedChildren, node)
 		}
+
+		if node.isRearranged() {
+			rearrangeChildren = append(removedChildren, node)
+		}
 		return true
 	})
+
 	for _, child := range removedChildren {
 		s.children.Delete(child)
+	}
+
+	for _, child := range rearrangeChildren {
+		s.children.Delete(child)
+	}
+
+	for _, child := range rearrangeChildren {
+		s.children.ReplaceOrInsert(child)
+		child.setRearrange(false)
 	}
 
 	events := make([]Event, 0)

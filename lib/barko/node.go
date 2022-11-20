@@ -32,6 +32,9 @@ type Node interface {
 	ResumeAllAnimations()
 	isAnimated() bool
 	setAnimated(state bool)
+	isRearranged() bool
+	setRearrange(state bool)
+	IsPointWithin(x float32, y float32) bool
 }
 
 func compareNode(a Node, b Node) bool {
@@ -56,10 +59,11 @@ type BaseNode struct {
 	opacity          float32
 	animatedState    bool
 	removeState      bool
+	rearrangeState   bool
 }
 
 func NewBaseNode() *BaseNode {
-	return &BaseNode{0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, make([]Action, 0), 1, false, false}
+	return &BaseNode{0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, make([]Action, 0), 1, false, false, false}
 }
 
 func (n *BaseNode) draw(screen *ebiten.Image) {
@@ -74,6 +78,14 @@ func (n *BaseNode) isAnimated() bool {
 
 func (n *BaseNode) setAnimated(state bool) {
 	n.animatedState = state
+}
+
+func (n *BaseNode) isRearranged() bool {
+	return n.rearrangeState
+}
+
+func (n *BaseNode) setRearrange(state bool) {
+	n.rearrangeState = state
 }
 
 func (n *BaseNode) Update(dt float32) {
@@ -115,6 +127,7 @@ func (n *BaseNode) GetOffsetZ() float32 {
 
 func (n *BaseNode) SetOffsetZ(z float32) {
 	n.offsetZ = z
+	n.setRearrange(true)
 }
 
 func (n *BaseNode) GetSize() (float32, float32) {
@@ -205,4 +218,9 @@ func (n *BaseNode) ResumeAllAnimations() {
 			action.Resume()
 		}
 	}
+}
+
+func (n *BaseNode) IsPointWithin(x float32, y float32) bool {
+	return n.x-n.anchorX*n.width*n.scaleX <= x && x <= n.x+(1-n.anchorX)*n.width*n.scaleX &&
+		n.y-n.anchorY*n.height*n.scaleY <= y && y <= n.y+(1-n.anchorY)*n.height*n.scaleY
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"barkdo/lib/barko"
+	"fmt"
 )
 
 func main() {
@@ -28,6 +29,27 @@ func main() {
 		barko.NewAnimFrame("test1", 0.2),
 		barko.NewAnimFrame("test2", 0.2),
 		barko.NewAnimFrame("test3", 0.2),
+		// barko.NewAnimFrame("test4", 0.2),
+		// barko.NewAnimFrame("test5", 0.2),
+	})))
+
+	image.AddAction(barko.NewSequenceWithActions([]barko.Action{
+		barko.NewWait(4),
+		barko.NewFuncCallWithFunc(func() {
+			image.SetOffsetZ(1)
+			fmt.Printf("Offset: %v", image.GetOffsetZ())
+		}),
+	}))
+
+	image2 := barko.NewSprite("test0")
+	scene.AddChild(image2)
+	image2.SetPosition(220, 220)
+
+	image2.AddAction(barko.NewRepeatForever(barko.NewAnimationWithFrames([]barko.AnimFrame{
+		barko.NewAnimFrame("test0", 0.35),
+		barko.NewAnimFrame("test1", 0.35),
+		barko.NewAnimFrame("test2", 0.35),
+		barko.NewAnimFrame("test3", 0.35),
 		// barko.NewAnimFrame("test4", 0.2),
 		// barko.NewAnimFrame("test5", 0.2),
 	})))
