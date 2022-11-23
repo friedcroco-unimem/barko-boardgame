@@ -3,6 +3,7 @@ package barko
 import (
 	"errors"
 	"image"
+	_ "image/jpeg"
 	_ "image/png"
 	"math"
 

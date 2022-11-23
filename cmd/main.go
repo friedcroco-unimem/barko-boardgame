@@ -2,10 +2,11 @@ package main
 
 import (
 	"barkdo/lib/awale"
-	"fmt"
 )
 
 func main() {
+	awale.Run()
+
 	// barko.GetGameManager().SetScreenSize(640, 480)
 	// barko.GetGameManager().SetGameLayout(640, 480)
 
@@ -54,42 +55,44 @@ func main() {
 	// 	// barko.NewAnimFrame("test5", 0.2),
 	// })))
 
+	// image2.SetOpacity(0.5)
+
 	// barko.GetGameManager().RunGame()
 
-	board := awale.NewCustomBoard([]int{0,
-		1, 0, 0, 0, 0,
-		0,
+	// board := awale.NewCustomBoard([]int{0,
+	// 	1, 0, 0, 0, 0,
+	// 	0,
 
-		0,
-		0,
-		1,
-		10,
-		0})
-	newBoard := board.Clone()
+	// 	0,
+	// 	0,
+	// 	1,
+	// 	10,
+	// 	0})
+	// newBoard := board.Clone()
 
-	bestMove := newBoard.GetBestMove()
-	fmt.Printf("best move: %v\n", bestMove.ToString())
+	// bestMove := newBoard.GetBestMove()
+	// fmt.Printf("best move: %v\n", bestMove.ToString())
 
-	newBoard.ExecuteTurnWithMove(bestMove)
+	// newBoard.ExecuteTurnWithMove(bestMove)
 
-	fmt.Print(board.ToString())
-	fmt.Print(newBoard.ToString())
+	// fmt.Print(board.ToString())
+	// fmt.Print(newBoard.ToString())
 
-	newBoard.ExecuteTurnWithMove(awale.NewMove(9, -1))
-	fmt.Print(newBoard.ToString())
+	// newBoard.ExecuteTurnWithMove(awale.NewMove(9, -1))
+	// fmt.Print(newBoard.ToString())
 
-	bestMove = newBoard.GetBestMove()
-	fmt.Printf("best move: %v\n", bestMove.ToString())
+	// bestMove = newBoard.GetBestMove()
+	// fmt.Printf("best move: %v\n", bestMove.ToString())
 
-	newBoard.ExecuteTurnWithMove(bestMove)
-	fmt.Print(newBoard.ToString())
+	// newBoard.ExecuteTurnWithMove(bestMove)
+	// fmt.Print(newBoard.ToString())
 
-	newBoard.ExecuteTurnWithMove(awale.NewMove(8, -1))
-	fmt.Print(newBoard.ToString())
+	// newBoard.ExecuteTurnWithMove(awale.NewMove(8, -1))
+	// fmt.Print(newBoard.ToString())
 
-	bestMove = newBoard.GetBestMove()
-	fmt.Printf("best move: %v\n", bestMove.ToString())
+	// bestMove = newBoard.GetBestMove()
+	// fmt.Printf("best move: %v\n", bestMove.ToString())
 
-	newBoard.ExecuteTurnWithMove(bestMove)
-	fmt.Print(newBoard.ToString())
+	// newBoard.ExecuteTurnWithMove(bestMove)
+	// fmt.Print(newBoard.ToString())
 }

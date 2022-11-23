@@ -61,4 +61,6 @@ func (a *application) changeScene(key string) {
 	}
 
 	a.curScene = a.scenes[key]
+	a.curScene.Reset()
+	a.curScene.Init()
 }

@@ -4,21 +4,13 @@ type Unit interface {
 	GetValue() int
 }
 
-type normalUnit struct{}
-
-func NewNormalUnit() Unit {
-	return &normalUnit{}
+type unit struct {
+	val int
 }
 
-func (u *normalUnit) GetValue() int { return 1 }
-
-type bossUnit struct{}
-
-func NewBossUnit() Unit {
-	return &bossUnit{}
+func (u *unit) GetValue() int {
+	return u.val
 }
 
-func (u *bossUnit) GetValue() int { return 5 }
-
-var normalUnitSample Unit = NewNormalUnit()
-var bossUnitSample Unit = NewBossUnit()
+var normalUnitSample Unit = &unit{1}
+var bossUnitSample Unit = &unit{5}

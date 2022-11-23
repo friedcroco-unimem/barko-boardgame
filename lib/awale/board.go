@@ -6,16 +6,26 @@ import (
 )
 
 type Move struct {
-	index     int
-	direction int
+	Index     int
+	Direction int
 }
 
 func NewMove(index int, direction int) *Move {
 	return &Move{index, direction}
 }
 
+type MoveStep struct {
+	FromSquareIndex int
+	UnitIndex       int
+	ToSquareIndex   int
+}
+
+func NewMoveStep(fromSquareIndex int, unitIndex int, toSquareIndex int) *MoveStep {
+	return &MoveStep{fromSquareIndex, unitIndex, toSquareIndex}
+}
+
 func (m *Move) ToString() string {
-	return fmt.Sprintf("[%v,%v]", m.index, m.direction)
+	return fmt.Sprintf("[%v,%v]", m.Index, m.Direction)
 }
 
 type Board struct {
@@ -64,6 +74,29 @@ func (b *Board) EndOfTurn() {
 	b.nextTurn()
 }
 
+func (b *Board) EndOfTurnToSteps() []*MoveStep {
+	res := make([]*MoveStep, 0)
+
+	if b.IsEndGame() {
+		for i := 1; i < 6; i++ {
+			for !b.squares[i].IsEmpty() {
+				res = append(res, NewMoveStep(i, b.squares[i].GetSize()-1, -1))
+				b.scores[0] += b.squares[i].PopUnit().GetValue()
+			}
+		}
+
+		for i := 7; i < 12; i++ {
+			for !b.squares[i].IsEmpty() {
+				res = append(res, NewMoveStep(i, b.squares[i].GetSize()-1, -2))
+				b.scores[1] += b.squares[i].PopUnit().GetValue()
+			}
+		}
+	}
+
+	b.nextTurn()
+	return res
+}
+
 func (b *Board) GetScore() int {
 	return (b.scores[0] - b.scores[1]) * (1 - 2*b.curTurn)
 }
@@ -85,6 +118,23 @@ func (b *Board) BeginOfTurn() {
 	}
 }
 
+func (b *Board) BeginOfTurnToSteps() []*MoveStep {
+	for i := 1 + 6*b.curTurn; i < 6+6*b.curTurn; i++ {
+		if !b.squares[i].IsEmpty() {
+			return make([]*MoveStep, 0)
+		}
+	}
+
+	res := make([]*MoveStep, 0)
+	for i := 1 + 6*b.curTurn; i < 6+6*b.curTurn && b.scores[b.curTurn] > 0; i++ {
+		b.squares[i].AddUnit(normalUnitSample)
+		res = append(res, NewMoveStep(-1-b.curTurn, 0, i))
+		b.scores[b.curTurn]--
+	}
+
+	return res
+}
+
 func (b *Board) GetAllMoves() []*Move {
 	res := make([]*Move, 0)
 	for i := 1 + 6*b.curTurn; i < 6+6*b.curTurn; i++ {
@@ -104,16 +154,16 @@ func (b *Board) ExecuteTurnWithMove(move *Move) {
 }
 
 func (b *Board) ApplyMove(move *Move) {
-	i := (move.index + move.direction + len(b.squares)) % len(b.squares)
-	j := move.index
+	i := (move.Index + move.Direction + len(b.squares)) % len(b.squares)
+	j := move.Index
 
 	for !b.squares[j].IsEmpty() && b.squares[j].IsMovable() {
-		for ; !b.squares[j].IsEmpty(); i = (i + move.direction + len(b.squares)) % len(b.squares) {
+		for ; !b.squares[j].IsEmpty(); i = (i + move.Direction + len(b.squares)) % len(b.squares) {
 			b.squares[i].AddUnit(b.squares[j].PopUnit())
 		}
 
 		j = i
-		i = (i + move.direction + len(b.squares)) % len(b.squares)
+		i = (i + move.Direction + len(b.squares)) % len(b.squares)
 	}
 
 	for b.squares[j].IsEmpty() && b.squares[j].IsPassable() && !b.squares[i].IsEmpty() {
@@ -121,10 +171,39 @@ func (b *Board) ApplyMove(move *Move) {
 			b.scores[b.curTurn] += b.squares[i].PopUnit().GetValue()
 		}
 
-		i = (i + move.direction + len(b.squares)) % len(b.squares)
+		i = (i + move.Direction + len(b.squares)) % len(b.squares)
 		j = i
-		i = (i + move.direction + len(b.squares)) % len(b.squares)
+		i = (i + move.Direction + len(b.squares)) % len(b.squares)
 	}
+}
+
+func (b *Board) ApplyMoveToSteps(move *Move) []*MoveStep {
+	res := make([]*MoveStep, 0)
+	i := (move.Index + move.Direction + len(b.squares)) % len(b.squares)
+	j := move.Index
+
+	for !b.squares[j].IsEmpty() && b.squares[j].IsMovable() {
+		for ; !b.squares[j].IsEmpty(); i = (i + move.Direction + len(b.squares)) % len(b.squares) {
+			res = append(res, NewMoveStep(j, b.squares[j].GetSize()-1, i))
+			b.squares[i].AddUnit(b.squares[j].PopUnit())
+		}
+
+		j = i
+		i = (i + move.Direction + len(b.squares)) % len(b.squares)
+	}
+
+	for b.squares[j].IsEmpty() && b.squares[j].IsPassable() && !b.squares[i].IsEmpty() {
+		for !b.squares[i].IsEmpty() {
+			res = append(res, NewMoveStep(i, b.squares[i].GetSize()-1, -1-b.curTurn))
+			b.scores[b.curTurn] += b.squares[i].PopUnit().GetValue()
+		}
+
+		i = (i + move.Direction + len(b.squares)) % len(b.squares)
+		j = i
+		i = (i + move.Direction + len(b.squares)) % len(b.squares)
+	}
+
+	return res
 }
 
 func (b *Board) Clone() *Board {
@@ -150,7 +229,7 @@ func (b *Board) IsEndGame() bool {
 			}
 		}
 
-		if !isEmpty && b.scores[player] == 0 {
+		if isEmpty && b.scores[player] == 0 {
 			return true
 		}
 	}

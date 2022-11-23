@@ -106,7 +106,7 @@ func NewBossSquareDefault() Square {
 func NewBossSquareWithCount(n int) Square {
 	units := make([]Unit, 0)
 	for i := 0; i < n; i++ {
-		units = append(units, normalUnitSample)
+		units = append(units, bossUnitSample)
 	}
 	return &bossSquare{NewBaseSquareWithUnits(units)}
 }

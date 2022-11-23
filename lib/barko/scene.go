@@ -7,6 +7,8 @@ import (
 
 type Scene interface {
 	draw(screen *ebiten.Image)
+	Init()
+	Reset()
 	Update(dt float32)
 	AddChild(node Node)
 	RemoveChild(node Node)
@@ -34,6 +36,14 @@ func NewBaseScene() *BaseScene {
 		make([]Event, 0),
 		0,
 	}
+}
+
+func (s *BaseScene) Init() {}
+
+func (s *BaseScene) Reset() {
+	s.children = btree.NewG(degreeChildTree, compareNode)
+	s.events = make([]Event, 0)
+	s.localID = 0
 }
 
 func (s *BaseScene) getNextLocalID() int {
