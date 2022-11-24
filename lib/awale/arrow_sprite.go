@@ -36,7 +36,12 @@ func NewArrowSprite(squareIndex int, direction int, s *gameScene) *barko.BaseSpr
 			return
 		}
 
-		s.setUpApplyMove(NewMove(squareIndex, direction))
+		move := NewMove(squareIndex, direction)
+		s.setUpApplyMove(move)
+		if !s.autoOpponent {
+			sendMove(move)
+		}
+
 		for _, arrow := range s.arrows {
 			arrow.RemoveFromScene()
 		}

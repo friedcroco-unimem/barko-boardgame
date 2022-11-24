@@ -6,6 +6,11 @@ import (
 
 const interval = 0.7
 
+const (
+	easy = 0
+	hard = 1
+)
+
 type gameScene struct {
 	*barko.BaseScene
 	board        *Board
@@ -13,11 +18,12 @@ type gameScene struct {
 	background   barko.Sprite
 	playerTurn   int
 	autoOpponent bool
+	hardLevel    int
 	arrows       []barko.Sprite
 	scoreGroups  []*digitGroup
 }
 
-func NewGameScene(playerTurn int, autoOpponent bool) *gameScene {
+func NewGameScene(playerTurn int, autoOpponent bool, hardLevel int) *gameScene {
 	units := make([][]barko.Sprite, 0)
 	for j := 0; j < 2; j++ {
 		units = append(units, NewBossSquareSprites())
@@ -28,7 +34,7 @@ func NewGameScene(playerTurn int, autoOpponent bool) *gameScene {
 	}
 
 	res := &gameScene{barko.NewBaseScene(), NewBoard(), units, barko.NewSprite("background"),
-		playerTurn, autoOpponent, make([]barko.Sprite, 0), []*digitGroup{}}
+		playerTurn, autoOpponent, hardLevel, make([]barko.Sprite, 0), []*digitGroup{}}
 
 	return res
 }
@@ -114,7 +120,11 @@ func (s *gameScene) waitForMove() {
 		s.waitForPlayerInput()
 	} else {
 		if s.autoOpponent {
-			s.setUpApplyMove(s.board.GetBestMove())
+			if s.hardLevel == hard {
+				s.setUpApplyMove(s.board.GetBestMove())
+			} else {
+				s.setUpApplyMove(s.board.GetRandomMove())
+			}
 		} else {
 			s.waitForOpponent()
 		}
@@ -132,6 +142,16 @@ func (s *gameScene) waitForPlayerInput() {
 
 func (s *gameScene) waitForOpponent() {
 	// Over network
+	go func() {
+		for {
+			msg := getNetworkMsg()
+			if msg != nil {
+				setNetworkMsg(nil)
+				s.setUpApplyMove(NewMove(msg.SquareIndex, msg.Direction))
+				break
+			}
+		}
+	}()
 }
 
 func (s *gameScene) setUpApplyMove(move *Move) {

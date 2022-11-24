@@ -8,9 +8,9 @@ import (
 type Mouse ebiten.MouseButton
 
 const (
-	MouseLeft   Mouse = Mouse(ebiten.MouseButtonLeft)
-	MouseRight        = ebiten.MouseButtonRight
-	MouseMiddle       = ebiten.MouseButtonMiddle
+	MouseLeft   = Mouse(ebiten.MouseButtonLeft)
+	MouseRight  = Mouse(ebiten.MouseButtonRight)
+	MouseMiddle = Mouse(ebiten.MouseButtonMiddle)
 )
 
 type MouseListener interface {

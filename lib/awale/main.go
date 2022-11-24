@@ -22,12 +22,22 @@ func preloadAssets() {
 	manager.PreloadImage("lose", "assets/text/lose.png")
 	manager.PreloadImage("draw", "assets/text/draw.png")
 	manager.PreloadImage("digit", "assets/text/digit.png")
+	manager.PreloadImage("connect", "assets/menu/connect.png")
+	manager.PreloadImage("continue", "assets/menu/continue.png")
+	manager.PreloadImage("create_pin", "assets/menu/create_pin.png")
+	manager.PreloadImage("easy", "assets/menu/easy.png")
+	manager.PreloadImage("enter_code", "assets/menu/enter_code.png")
+	manager.PreloadImage("hard", "assets/menu/hard.png")
+	manager.PreloadImage("medium", "assets/menu/medium.png")
+	manager.PreloadImage("new_game", "assets/menu/new_game.png")
+	manager.PreloadImage("with_computer", "assets/menu/with_computer.png")
+	manager.PreloadImage("with_player", "assets/menu/with_player.png")
 }
 
 func setDefaultScene() {
 	manager := barko.GetGameManager()
-	manager.AddScene("game", NewGameScene(0, true))
-	manager.ChangeScene("game")
+	manager.AddScene("menu", NewMenuScene())
+	manager.ChangeScene("menu")
 }
 
 func run() {

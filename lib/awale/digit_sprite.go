@@ -14,10 +14,10 @@ type digitGroup struct {
 	digits     []barko.Sprite
 	value      int
 	posX, posY float32
-	s          *gameScene
+	s          barko.Scene
 }
 
-func NewDigitGroup(s *gameScene, posX, posY float32) *digitGroup {
+func NewDigitGroup(s barko.Scene, posX, posY float32) *digitGroup {
 	res := &digitGroup{make([]barko.Sprite, 0), 0, posX, posY, s}
 	res.ChangeValue(0)
 	return res

@@ -1,6 +1,16 @@
 package awale
 
+import "math/rand"
+
 const minimaxDepth = 5
+
+func (b *Board) GetRandomMove() *Move {
+	allMoves := b.GetAllMoves()
+	if len(allMoves) == 0 {
+		return nil
+	}
+	return allMoves[rand.Intn(len(allMoves))]
+}
 
 func (b *Board) GetBestMove() *Move {
 	move, _ := minimax(minimaxDepth, b.Clone(), true, b.curTurn)
