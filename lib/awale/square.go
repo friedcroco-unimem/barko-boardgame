@@ -10,6 +10,7 @@ type Square interface {
 	PopUnit() Unit
 	AddUnit(unit Unit)
 	PopAllUnits() []Unit
+	GetAllUnits() []Unit
 	Clone() Square
 }
 
@@ -53,6 +54,10 @@ func (s *baseSquare) PopAllUnits() []Unit {
 	res := s.units
 	s.units = make([]Unit, 0)
 	return res
+}
+
+func (s *baseSquare) GetAllUnits() []Unit {
+	return s.units
 }
 
 type normalSquare struct {

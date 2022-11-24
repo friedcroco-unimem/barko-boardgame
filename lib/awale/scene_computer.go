@@ -19,9 +19,15 @@ func (s *menuComputerScene) Init() {
 	s.AddChild(background)
 
 	// draw options
+	_, saveExists := isSaveDataExist()
 	newGameMode := barko.NewSprite("new_game")
 	newGameMode.SetAnchor(0.5, 0.5)
-	newGameMode.SetPosition(float32(screenWidth/2), float32(screenHeight/2-40))
+	if saveExists {
+		newGameMode.SetPosition(float32(screenWidth/2), float32(screenHeight/2-40))
+	} else {
+		newGameMode.SetPosition(float32(screenWidth/2), float32(screenHeight/2))
+	}
+
 	s.AddChild(newGameMode)
 
 	clickNewGame := barko.NewMouseOverNodeListener(barko.MouseLeft, newGameMode)
@@ -31,8 +37,17 @@ func (s *menuComputerScene) Init() {
 	})
 	s.AddEvent(clickNewGame)
 
-	continueMode := barko.NewSprite("continue")
-	continueMode.SetAnchor(0.5, 0.5)
-	continueMode.SetPosition(float32(screenWidth/2), float32(screenHeight/2+40))
-	s.AddChild(continueMode)
+	if saveExists {
+		continueMode := barko.NewSprite("continue")
+		continueMode.SetAnchor(0.5, 0.5)
+		continueMode.SetPosition(float32(screenWidth/2), float32(screenHeight/2+40))
+		s.AddChild(continueMode)
+
+		clickContinue := barko.NewMouseOverNodeListener(barko.MouseLeft, continueMode)
+		clickContinue.SetOnMouseDown(func(float32, float32) {
+			manager.AddScene("continue", NewGameSceneWithSaveData())
+			manager.ChangeScene("continue")
+		})
+		s.AddEvent(clickContinue)
+	}
 }

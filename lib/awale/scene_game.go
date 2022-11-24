@@ -39,6 +39,35 @@ func NewGameScene(playerTurn int, autoOpponent bool, hardLevel int) *gameScene {
 	return res
 }
 
+func NewGameSceneWithSaveData() *gameScene {
+	data, _ := isSaveDataExist()
+	save := stringToFileData(data)
+
+	board := NewBoard()
+	for _, move := range save.Moves {
+		board.BeginOfTurn()
+		board.ApplyMove(NewMove(move.SquareIndex, move.Direction))
+		board.EndOfTurn()
+	}
+
+	units := make([][]barko.Sprite, 12)
+	for i := 0; i < 12; i++ {
+		units[i] = make([]barko.Sprite, 0)
+		for _, u := range board.squares[i].GetAllUnits() {
+			if u.GetValue() == 1 {
+				units[i] = append(units[i], NewNormalUnitSprite())
+			} else {
+				units[i] = append(units[i], NewBossUnitSprite())
+			}
+		}
+	}
+
+	res := &gameScene{barko.NewBaseScene(), board, units, barko.NewSprite("background"),
+		0, true, save.HardLevel, make([]barko.Sprite, 0), []*digitGroup{}}
+
+	return res
+}
+
 func NewBossSquareSprites() []barko.Sprite {
 	return []barko.Sprite{NewBossUnitSprite()}
 }
@@ -95,6 +124,7 @@ func (s *gameScene) Init() {
 }
 
 func (s *gameScene) setUpStartTurn() {
+	s.updateShowScore()
 	steps := s.board.BeginOfTurnToSteps()
 	turn := yourTurn
 	if s.playerTurn != s.board.curTurn {
@@ -160,6 +190,10 @@ func (s *gameScene) setUpApplyMove(move *Move) {
 		s.updateShowScore()
 		s.setUpEndTurn()
 	})))
+
+	if s.autoOpponent {
+		addMoveToSaveData(move.Index, move.Direction, s.hardLevel)
+	}
 }
 
 func (s *gameScene) setUpEndTurn() {
@@ -191,6 +225,7 @@ func (s *gameScene) raiseEndGameSignal() {
 	}
 
 	s.AddChild(NewTextSprite(text, s, barko.NewFuncCall()))
+	deleteSaveData()
 }
 
 func (s *gameScene) ApplyMoveStepSequence(steps []*MoveStep, finalAction barko.Action) barko.Action {
