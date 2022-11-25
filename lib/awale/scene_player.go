@@ -2,7 +2,6 @@ package awale
 
 import (
 	"barkdo/lib/barko"
-	"errors"
 )
 
 type menuPlayerScene struct {
@@ -31,7 +30,7 @@ func (s *menuPlayerScene) Init() {
 	clickCreate.SetOnMouseDown(func(float32, float32) {
 		pin, err := createNewPin()
 		if err != nil {
-			panic(errors.New("cannot create pin"))
+			panic(err)
 		}
 
 		manager := barko.GetGameManager()

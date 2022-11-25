@@ -2,6 +2,7 @@ package awale
 
 import (
 	"flag"
+	"log"
 	"net/url"
 	"os"
 	"os/signal"
@@ -9,7 +10,10 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// const host string = "178.128.121.220:8080"
+
 const host string = "localhost:3080"
+const protocol string = "ws"
 
 var socket *websocket.Conn = nil
 
@@ -29,13 +33,13 @@ func joinPin(pin int) (int, error) {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
-	u := url.URL{Scheme: "ws", Host: *addr, Path: "/pair_client"}
+	u := url.URL{Scheme: protocol, Host: *addr, Path: "/pair_client"}
 	// log.Printf("connecting to %s", u.String())
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	socket = c
 	if err != nil {
-		// log.Println("dial:", err)
+		log.Println("dial:", err)
 		return 0, err
 	}
 
@@ -45,7 +49,7 @@ func joinPin(pin int) (int, error) {
 		"pin_code":     pin,
 	})
 	if err != nil {
-		// log.Println("write:", err)
+		log.Println("write:", err)
 		c.Close()
 		return 0, err
 	}
@@ -53,7 +57,7 @@ func joinPin(pin int) (int, error) {
 	var body networkMsg
 	err = c.ReadJSON(&body)
 	if err != nil {
-		// log.Println("read:", err)
+		log.Println("read:", err)
 		c.Close()
 		return 0, err
 	}
@@ -87,7 +91,7 @@ func createNewPin() (int, error) {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
-	u := url.URL{Scheme: "ws", Host: *addr, Path: "/connect_client"}
+	u := url.URL{Scheme: protocol, Host: *addr, Path: "/connect_client"}
 	// log.Printf("connecting to %s", u.String())
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)

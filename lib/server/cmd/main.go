@@ -1,17 +1,17 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"math/rand"
-	"net/http"
 	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
+
+	cors "github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
-var addr = flag.String("addr", "localhost:3080", "http service address")
 var upgrader = websocket.Upgrader{} // use default options
 
 var waitingClients map[int]*websocket.Conn = make(map[int]*websocket.Conn)
@@ -40,7 +40,29 @@ type toMessage struct {
 	Direction   int `json:"direction"`
 }
 
-func connectClient(w http.ResponseWriter, r *http.Request) {
+func StartHTTPServer() error {
+	// Create a gin router with default middleware
+	path := gin.Default()
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowCredentials = true
+	config.AllowHeaders = []string{"Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "accept", "Origin", "Cache-Control", "X-Requested-With"}
+	path.Use(cors.New(config))
+
+	apiPath := path.Group("")
+	registerDataStructureRoute(apiPath)
+
+	return path.Run(":3080")
+}
+
+func registerDataStructureRoute(r *gin.RouterGroup) {
+	r.GET("/connect_client", connectClient)
+	r.GET("/pair_client", pairClient)
+}
+
+func connectClient(g *gin.Context) {
+	w := g.Writer
+	r := g.Request
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Print("upgrade:", err)
@@ -89,7 +111,10 @@ func connectClient(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func pairClient(w http.ResponseWriter, r *http.Request) {
+func pairClient(g *gin.Context) {
+	w := g.Writer
+	r := g.Request
+
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Print("upgrade:", err)
@@ -172,9 +197,10 @@ func pairClient(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	flag.Parse()
-	log.SetFlags(0)
-	http.HandleFunc("/connect_client", connectClient)
-	http.HandleFunc("/pair_client", pairClient)
-	log.Fatal(http.ListenAndServe(*addr, nil))
+	// flag.Parse()
+	// log.SetFlags(0)
+	// http.HandleFunc("/connect_client", connectClient)
+	// http.HandleFunc("/pair_client", pairClient)
+	// log.Fatal(http.ListenAndServe(*addr, nil))
+	StartHTTPServer()
 }
